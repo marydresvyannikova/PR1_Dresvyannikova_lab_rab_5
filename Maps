@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Yandex api map</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/j.."></script>
+<script src="https://api-maps.yandex.ru/2.0-stable/?load=package.f.." type="text/javascript"></script>
+</head>
+<body>
+<div id="map" style="background: red;width: 600px; height: 400px"></div>
+<div id="map1" style="background: red;width: 600px; height: 400px"></div>
+<div id="map2" style="background: red;width: 600px; height: 400px"></div>
+<div id="map3" style="background: red;width: 600px; height: 400px"></div>
+
+<script type="text/javascript">
+var myMap;
+//заметь, если мы поменяем название функции, то нихера работать не будет.
+//почему? Мы подключаем библиотеку с .....u-RU&onload=init указывая функции
+//что будет вызвана при загрузке библиотеки.
+function init(){
+ymaps.geocode("Рио-де-Жанейро")
+.then(
+//почему вызов такой? Потому что это асинхронный запрос
+//результат может придти через 1секунду или пару минут, а может и не придти вовсе
+//Поскольку код интерпретируется построчно, то необходимо создать коллбек,
+//который вызывался при завершении запроса. Такой механизм называется промисами(promise).
+function (res) {
+//получим координаты рио-де-Жанейро
+var coords = res.geoObjects.get(0).geometry.getCoordinates();
+myMap = new ymaps.Map("map", {
+center: coords
+,zoom: 8
+,behaviors:[],
+type: 'yandex#satellite'
+});
+myMap.behaviors.enable(['drag','scrollZoom']);//врубим перетаскивание с зажатой клавишей
+//и скрол по колесику мыши
+myMap.controls.add('zoomControl'); //ну или добавить скролл.
+//coords есть [ширина, долгота], потом размер круга. Пустые два обьекта
+//это properties и options. Они необязательные и если их удалить ничего не изменится
+//но например так: myCirc = new ymaps.Circle([coords, 5000], {}, {fillColor: "000", - изменить заливку на черный
+// fillOpacity: 0.5, - изменить прозрачность заливки
+// strokeColor: "ff0000", - сделать обводку красненькой
+// strokeWidth: 5} - и сделать обводку жирнючей
+// ); - более подробно можешь посмотреть доки https://tech.yandex.ru/maps/doc/jsapi/2.1/ref/referen..
+myCirc = new ymaps.Circle([coords, 5000], {}, {});
+myMap.geoObjects.add(myCirc);//теперь этот обьект надо добавить на карту
+
+},
+function (err) {
+alert('Ошибка');
+}
+);
+ymaps.geocode("Парагвай, Асунсьон")
+.then(
+function (res) {
+var coords = res.geoObjects.get(0).geometry.getCoordinates();
+myMap = new ymaps.Map("map1", {
+center: coords
+,zoom: 10
+,behaviors:[]
+});
+myMap.behaviors.enable(['drag','scrollZoom']);
+myMap.controls.add('zoomControl');
+var polygon = new ymaps.Polygon([
+// [[-25.37, -57.7], [-25.2, -57.7], [-25.2, -57.54], [-25.37, -57.54]]
+[[-25.37, -57.7], [-25.22, -57.7], [-25.18, -57.62], [-25.22, -57.54], [-25.37, -57.54], [-25.4, -57.62]]
+], {
+hintContent: "Шестиугольник"
+}, {
+fill: false,
+strokeWidth: 4
+});
+myMap.geoObjects.add(polygon);
+},
+function (err) {
+alert('Ошибка');
+}
+);
+ymaps.geocode("Намибия, Виндхук")
+.then(
+function (res) {
+var coords = res.geoObjects.get(0).geometry.getCoordinates();
+myMap = new ymaps.Map("map2", {
+center: coords
+,zoom: 8
+,behaviors:[]
+});
+myMap.behaviors.enable(['drag','scrollZoom']);
+myMap.controls.add('zoomControl');
+var rectangle = new ymaps.Rectangle([[-22.65, 17], [-22.52, 17.15]], {}, {});
+myMap.geoObjects.add(rectangle);
+},
+function (err) {
+alert('Ошибка');
+}
+);
+ymaps.geocode("Юкон-Коюкек")
+.then(
+function (res) {
+var coords = res.geoObjects.get(0).geometry.getCoordinates();
+console.log("Юкон-коюкек "+coords);
+myMap = new ymaps.Map("map3", {
+center: coords
+,zoom: 8
+});
+myMap.behaviors.enable(['drag','scrollZoom']);
+myMap.controls.add('zoomControl');
+var polygon = new ymaps.Polygon([
+[[65.512, -151.375], [65.512, -151.406], [65.505, -151.392]]
+// [[-25.37, -57.7], [-25.22, -57.7], [-25.18, -57.62], [-25.22,
+16:34:26	
+-57.54], [-25.37, -57.54], [-25.4, -57.62]]
+], {
+hintContent: "Шестиугольник"
+}, {
+fill: false,
+strokeWidth: 4
+});
+myMap.geoObjects.add(polygon);
+},
+function (err) {
+alert('Ошибка');
+}
+);
+}
+</script>
+</body>
+</html>
